@@ -37,7 +37,7 @@ export default {
   },
   data() {
     return {
-      title: "汉中人畜管理系统",
+      title: "人力资源管理系统",
       logo: true,
     };
   },

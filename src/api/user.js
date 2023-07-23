@@ -19,9 +19,20 @@ export function login(data) {
 export function getUserInfo() {
     return request({
         url: '/sys/profile',
-        method: 'get',
+        method: 'post',
     })
 }
+
+/**
+ * 根据用户ID获取用户基本信息
+ */
+export function getUserDetailById(id) {
+    return request({
+        url: `/sys/user/${id}`
+    })
+}
+
+
 
 export function logout() {
 

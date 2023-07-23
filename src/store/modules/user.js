@@ -1,9 +1,10 @@
 //引入操作cookie的模块
-import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login } from '@/api/user'
+import { getToken, setToken, removeToken, setTimeKey, getTimeKey } from '@/utils/auth'
+import { login, getUserInfo, getUserDetailById } from '@/api/user'
 
 const state = {
-  token: getToken()
+  token: getToken(),
+  userInfo: {}
 }
 
 const mutations = {
@@ -16,14 +17,38 @@ const mutations = {
   removeToken(state) {
     state.token = null
     removeToken()
+  },
+  //设置用户信息
+  setUserInfo(state, result) {
+    state.userInfo = result
+  },
+  //删除用户信息
+  deleteUserInfo(state) {
+    state.userInfo = {}
   }
 }
 
 const actions = {
+  //登录
   async login(context, data) {
     const result = await login(data)
-    console.log(result);
     context.commit('setToken', result)
+    //设置时间戳
+    setTimeKey()
+  },
+  async getUserInfo(context) {
+    const result = await getUserInfo()
+    //获取用户详情，得到头像数据
+    const baseInfo = await getUserDetailById(result.userId)
+    //合并接口数据
+    const obj = { ...result, ...baseInfo }
+    context.commit('setUserInfo', obj)//提交到mutations
+    return result
+  },
+  //退出登录
+  logout(context) {
+    context.commit('removeToken')
+    context.commit('deleteUserInfo')
   }
 }
 

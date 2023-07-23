@@ -9,7 +9,7 @@
       label-position="left"
     >
       <div class="title-container">
-        <h3 class="title">SAAS 后台登录系统</h3>
+        <h3 class="title">人力资源管理后台登录系统</h3>
       </div>
 
       <el-form-item prop="mobile">
@@ -150,12 +150,12 @@ export default {
 $bg: #283443;
 $light_gray: #68b0fe; // 将输入框颜色改成蓝色
 $cursor: #fff;
-
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
     color: $cursor;
   }
 }
+
 
 /* reset element-ui css */
 .login-container {

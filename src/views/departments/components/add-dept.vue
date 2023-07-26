@@ -1,6 +1,6 @@
 <template>
   <!-- 新增部门的弹层 -->
-  <el-dialog title="新增部门" :visible="showDialog" @close="btnCancel">
+  <el-dialog :title="title" :visible="showDialog" @close="btnCancel">
     <!-- 表单组件  el-form   label-width设置label的宽度   -->
     <!-- 匿名插槽 -->
     <el-form label-width="120px" :model="formData" :rules="rules" ref="form">
@@ -59,6 +59,7 @@ import {
   getDepartmentList,
   addDepartment,
   getDepartmentDetail,
+  updateDepartments,
 } from "@/api/departments";
 import { getSimpleEmployees } from "@/api/employees";
 export default {
@@ -66,10 +67,16 @@ export default {
     //检查新增的部门名称是否重复
     const checkNameRepeat = async (rule, value, callback) => {
       const { depts } = await getDepartmentList();
-      const isRepeat = depts
-        .filter((item) => item.pid === this.treeNode.id)
-        .some((item) => item.name === value);
-      console.log(isRepeat);
+      let isRepeat = false;
+      if (this.formData.id) {
+        isRepeat = depts
+          .filter((item) => item.pid === this.treeNode.id)
+          .some((item) => item.name === value);
+      } else {
+        isRepeat = depts
+          .filter((item) => item.pid === this.treeNode.id)
+          .some((item) => item.name === value);
+      }
       isRepeat
         ? callback(new Error(`同级部门下已有名为${value}的部门`))
         : callback();
@@ -78,7 +85,14 @@ export default {
     // 检查新增部门的编码是否重复
     const checkCodeRepeat = async (rule, value, callback) => {
       const { depts } = await getDepartmentList();
-      const isRepeat = depts.some((item) => item.code === value);
+      let isRepeat = false;
+      if (this.formData.id) {
+        isRepeat = depts.some(
+          (item) => item.id !== this.formData.id && item.code === value && value
+        );
+      } else {
+        isRepeat = depts.some((item) => item.code === value && value); // 这里加一个 value不为空 因为我们的部门有
+      }
       isRepeat ? callback(new Error(`已有编号为${value}的部门`)) : callback();
     };
     return {
@@ -146,6 +160,11 @@ export default {
     },
   },
 
+  computed: {
+    title() {
+      return this.formData.id ? "编辑部门" : "添加子部门";
+    },
+  },
   methods: {
     async getSimpleEmployees() {
       const result = await getSimpleEmployees();
@@ -155,15 +174,28 @@ export default {
     btnOk() {
       this.$refs.form.validate(async (isOk) => {
         if (isOk) {
-          await addDepartment({ ...this.formData, pid: this.treeNode.id });
-          this.$emit("addDept");
-          //关闭弹层
+          // 要分清楚现在是编辑还是新增
+          if (this.formData.id) {
+            await updateDepartments(this.formData);
+          } else {
+            // 新增模式
+            await addDepartment({ ...this.formData, pid: this.treeNode.id }); // 调用新增接口 添加父部门的id
+          }
+          this.$emit("addDept"); // 重新拉取数据
+          // 关闭弹窗
           this.$emit("update:showDialog", false);
         }
       });
     },
     //取消按钮
     btnCancel() {
+      //重置表单数据
+      this.formData = {
+        name: "", // 部门名称
+        code: "", // 部门编码
+        manager: "", // 部门管理者
+        introduce: "", // 部门介绍
+      };
       this.$emit("update:showDialog", false);
       this.$refs.form.resetFields();
     },

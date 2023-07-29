@@ -11,3 +11,27 @@ export function getSimpleEmployees() {
     })
 }
 
+
+/***
+ * 
+ * 获取员工列表接口
+ * 
+ */
+export function getEmployeeList(params) {
+    return request({
+        url: '/sys/user',
+        params
+    })
+}
+
+/***
+ * 
+ * 删除员工接口
+ * 
+ */
+export function delEmployee(id) {
+    return request({
+        url: `/sys/user/${id}`,
+        method: 'delete'
+    })
+}

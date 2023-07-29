@@ -17,6 +17,10 @@ import '@/permission' // permission control
 
 import * as directives from '@/directives'
 
+import PageTools from '@/components'
+
+import * as filters from '@/filters'
+
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
@@ -27,6 +31,12 @@ Vue.config.productionTip = false
 Object.keys(directives).forEach(key => {
   Vue.directive(key, directives[key])
 })
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+
+Vue.use(PageTools)
 
 new Vue({
   el: '#app',
